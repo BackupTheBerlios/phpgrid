@@ -38,7 +38,7 @@
         *the most common management operations.
         *
         *@version 0.1
-        *@author José León Serna <jose.leon@securitydata.es>
+        *@author Security Data S.A. <info@securitydata.es>
         */
         class PHPGrid
         {
