@@ -1,0 +1,92 @@
+What is it all about?
+---------------------
+php_jh_pdf is a set of classes intended to simplify the generation of PDF
+documents with PHP. It enables you to put down continuous text with automatic
+line wrapping, automatic creation of new pages, etc. It also renders barcodes
+directly onto the PDF document. It offers classes for creating tables by only
+specifying column widths and the data to put into the cells. The table layout
+(border widths, colors) is highly adjustable. The table class builds on top of
+the other classes, so table cells can contain anything supported by the other
+php_jh_pdf classes. The interface used by the table class to output the actual
+content is simple and classes for putting in other content can thus be easily
+created.
+
+
+
+
+Where to start
+--------------
+There are several examples included showing how to use all the classes:
+- example-barcode.php
+- example-flowingtext.php
+- example-container.php
+- example-table.php
+- example-table2.php
+- example-table3.php
+I suggest to start with the barcode example as it's the most simple one.
+Proceed with text example and then take the other examples as they build
+on top of barcode and text.
+
+
+
+Color parameters
+----------------
+Colors can be represented in four forms:
+1.) Plain number - represents a gray level from 0=black to 1=white
+2.) Array with one element - the element is treated like the plain number
+    in 1.)
+3.) Array with three elements - the elements represent the R/G/B intensity,
+    each element going from 0 to 1
+4.) Array with four elements - the elements represent the C/M/Y/K intensity,
+    each element going from 0 to 1
+
+A color can also have the special value "false" which means that nothing
+will be drawn and the referred space will be left blank (transparency).
+
+
+
+Further documentation
+---------------------
+All classes have phpdoc style comments. The html documentation created
+by the phpdoc tool (see http://www.phpdoc.de) is included in the doc
+subdirectory. It is far from being perfect, but gives a good overview
+over the available methods.
+
+
+
+The JH PDF container interface (jhpci)
+--------------------------------------
+The table and container classes don't have any methods to output the actual
+content. To do it, they require classes having certain methods, which are
+called to calcalute the required space and put down the actual content.
+Classes providing these methods are called "JH PDF container interface"
+(jhpci).
+
+The JHPCI methods are:
+
+jhpci_setwidth($width)
+This method is called to tell the class how much space it may use in the
+horizontal direction.
+
+jhpci_data($data)
+This method is called to tell the class which data should go into the
+cell. Note that it doesn't care about the type of data which is passed.
+When it is called, the data is simply passed through to the underlying
+class. So it isn't necessarily the textual representation which is put
+into the cell, just think of the barcode class, which outputs in the
+barcode representing the string. It is enterily up to the underlying
+class what it does with the data!
+
+jhpci_getrequiredheight()
+This method is called to get the height which is required to put down
+the data set through jhpci_data() with the width set through
+jhpci_setwidth(). The value returned by this method must be meassured
+in PDF pixels.
+
+jhpci_putdata($xpos, $ypos)
+This method is called to tell the class that it should actually put
+down the data at the passed coordinates.
+
+If you don't understand that, have a look at the files having "jhpci"
+in their name. They are classes derived from other classes extending
+them to have the mentioned methods.

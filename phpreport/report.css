@@ -1,0 +1,33 @@
+body {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.reportheader {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+        color: #FFFFFF;		
+		font-weight: bold;		
+		background-color: #000000;
+}
+
+.subreportheader {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+        color: #FFFFFF;		
+		font-weight: bold;		
+		background-color: #505050;
+}
+
+.reportdetailodd {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+		background-color: #F0F0F0;
+        font-color: #000000;
+}
+
+.reportdetaileven {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+		background-color: #FFFFFF;
+        font-color: #000000;
+}

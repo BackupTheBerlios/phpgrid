@@ -1,0 +1,28 @@
+1.2.1 (2002-10-01):
+- Fixed several 'Call-time pass-by-reference has been deprecated' warnings
+  in PHP 4.x
+- Changed changelog dates to international format
+
+1.2.0 (2002-05-18):
+- Added support for barcode type 128a/b/c (use settype() in jh_pdf_barcode)
+- Added support for static row heights (use forcerowheight() in jh_pdf_table)
+- Added support for clipping to cell area, so that cell contents exceeding
+  the cell boundaries will be invisible (use cliptocell() in jh_pdf_table)
+- Added an example for printing fixed size labels, available from
+  Avery in the U.S. (correct?) and from Zweckform in Germany (have a look
+  at example-table3.php)
+
+1.1.0 (2002-04-10):
+- Added support for barcode type 2 of 5 interleaved
+- Added container class for putting more than one object into a
+  defined space; useful in conjunction with tables
+- Added method addcell() to table class for building the table cell by cell
+- Multiple "*" (auto-width) columns in table class are now allowed and
+  will result in the remaining space being equally distributed to these
+  columns
+- Bugfix in table class: using row spacing, top border, after-header border
+  and bottom border is now possible without applying a color (transparency)
+- Changed examples to use PDF_new() and PDF_open_file() instead of
+  the deprecated PDF_open() function as described in the PDFlib manual
+- Changed examples to create the documents in memory instead of
+  using temporary files

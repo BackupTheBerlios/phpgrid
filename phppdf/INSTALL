@@ -1,0 +1,65 @@
+Note: Some of the described methods may work under Unix only. Don't ask
+me how to do it under Windows - Windows is UNSUPPORTED!
+
+
+
+Prerequesites
+-------------
+Of course you require PHP (available at http://www.php.net). The classes
+use several things only available in PHP 4, i.e. PHP 3 does NOT work. It
+doesn't matter if you use the command line version of PHP (i.e. CGI) or a
+web server module. If you use a web server module, I strongly recommend
+you NOT to use Windows/IIS. This stuff is just too unreliable.
+
+You will also need pdflib (available at http://www.pdflib.com).
+Version 4.0.2 or later is strongly recommended. Versions prior to
+4.0.0 didn't have any official PHP support and version 4.0.1
+has a bug in the PHP binding when getting capsheight/ascender/descender
+values from a font.
+
+You also MUST build PHP with pdflib support and with the C source files
+included in the pdflib package, not with the ones included in the
+PHP distribution! To do this, copy pdf.c and php_pdf.h from
+/usr/src/pdflib-4.0.1/bind/php/ext/pdf/ to /usr/src/php-4.x.x/ext/pdf/
+and rebuild PHP.
+
+
+
+Running the examples
+--------------------
+The examples require that you use a web server module version of PHP,
+otherwise you have to modify them so that the PDF data gets output
+into a file.
+
+Simply extract the tarball into a directory accessible via the web
+server and instruct your web browser to point to this directory.
+You will see a small web page (the index.html file) with links
+to the different examples. Just click on them and you will see
+the generated PDF documents.
+
+
+
+Installing the classes
+----------------------
+You have two choices to install the class files. In both cases all you
+have to copy is "class.*.inc.php".
+
+If you are going to develop an application which you plan to distribute,
+the best method is probably to copy the files to the directory where
+your application files reside. When distributing your application, just
+include the php_jh_pdf files.
+
+If you are going to install php_jh_pdf on a machine which runs several
+applications that use php_jh_pdf, you might like to put the class
+files into a central directory (maybe /usr/local/lib/php4) and instruct
+PHP to search files in this directory (use the include_path directive
+in your php.ini file).
+
+
+
+Installing multiple versions of php_jh_pdf
+------------------------------------------
+As you have probably noticed, all the class files include a version number,
+so you can install multiple versions of php_jh_pdf without any problem.
+If you dislike to change the file names in your application files every
+time you upgrade php_jh_pdf, use symbolic links, just like ld.so does.
