@@ -1,0 +1,424 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/css"
+href="http://tux.sdlocal.net/dtd/docbook.css"
+?><!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://tux.sdlocal.net/dtd/docbookx.dtd">
+<article>
+  <title>PHPGrid - Manual de usuario</title>
+
+  <articleinfo>
+    <author>
+      <surname>S.A. </surname>
+
+      <firstname>Security Data</firstname>
+    </author>
+
+    <revhistory>
+      <revision>
+        <revnumber>1</revnumber>
+
+        <date>09/09/2002</date>
+      </revision>
+
+      <revision>
+        <revnumber>2</revnumber>
+
+        <date>01/10/2002</date>
+
+        <revdescription>
+          <para>Modificaciones para PHPGrid</para>
+
+          <para>Eliminación de propiedades y métodos documentados en la
+          referencia</para>
+        </revdescription>
+      </revision>
+    </revhistory>
+  </articleinfo>
+
+  <sect1>
+    <title>Qué es y para que sirve</title>
+
+    <simpara>PHPGrid es un objeto de PHP que permite
+    navegar/añadir/editar/buscar registros en una tabla de base de datos. Tras
+    buscar en internet algun producto con funcionalidad similar, se decidió
+    crear uno nuevo partiendo de cero, ya que los existentes no tenían las
+    funcionalidades requeridas, como por ejemplo, crear formularios
+    maestro-detalle, gestionar campos calculados, etc.</simpara>
+  </sect1>
+
+  <sect1>
+    <title>Objetivos de su desarrollo</title>
+
+    <para>El objetivo principal es acelerar el desarrollo de aplicaciones de
+    gestión dentro de Security Data, permitiendo reutilizar código y aislando
+    los procesos comunes en las aplicaciones de gestión.</para>
+  </sect1>
+
+  <sect1>
+    <title>Interfaz con base de datos</title>
+
+    <para>El interfaz que se utiliza para gestionar la base de datos es <ulink
+    url="http://php.weblogs.com/ADODB" userlevel="">ADOdb</ulink>, que permite
+    acceso transparente a cualquier tipo de base de datos. El componente solo
+    se ha probado con MySQL. Es conveniente conocer como funcionan las clases
+    de ADOdb para aprovechar al máximo las posibilidades del componente, como
+    por ejemplo, los campos calculados.</para>
+  </sect1>
+
+  <sect1>
+    <title>Como se utiliza</title>
+
+    <para>Su utilización es muy sencilla, solo hay que seguir estos pasos:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Incorporar a nuestro código el componente:</para>
+
+        <programlisting>include &#34;phpgrid.php&#34;;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Crear un objeto de esa clase:</para>
+
+        <programlisting>$phpgrid=new PHPGrid(&#39;172.16.2.6&#39;,&#39;root&#39;,&#39;&#39;,&#39;postnuke&#39;,&#39;products&#39;);</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Configurar las distintas propiedades</para>
+      </listitem>
+
+      <listitem>
+        <para>Llamar al método run</para>
+
+        <programlisting>$phpgrid-&#62;run();</programlisting>
+      </listitem>
+    </orderedlist>
+
+    <sect2>
+      <title>Ejemplo</title>
+
+      <para>A continuación se pone un ejemplo completo de utilización:</para>
+
+      <programlisting>&#60;?php
+      include &#34;phpgrid.php&#34;;
+      $phpgrid=new PHPGrid(&#39;172.16.2.6&#39;,&#39;root&#39;,&#39;&#39;,&#39;postnuke&#39;,&#39;products&#39;);
+      $phpgrid-&#62;formcaption=&#34;Productos&#34;;
+      $phpgrid-&#62;labels=array(
+                           &#39;prod_id&#39;=&#62;&#39;Propiedades&#39;,
+                           &#39;prod_owner&#39;=&#62;&#39;Propietario&#39;,
+                           &#39;prod_type&#39;=&#62;&#39;Tipo&#39;,
+                           &#39;prod_label&#39;=&#62;&#39;Etiqueta&#39;
+                          );
+      $phpgrid-&#62;controls=array(
+                           &#39;prod_type&#39;=&#62;array(&#39;combo&#39;=&#62;array(&#39;items&#39;=&#62;array(&#39;1&#39;=&#62;&#39;Firewall&#39;,&#39;2&#39;=&#62;&#39;CSR&#39;,&#39;3&#39;=&#62;&#39;Antivirus&#39;)))
+                          );
+      $phpgrid-&#62;novisible=array(
+                           &#39;prod_id&#39;=&#62;&#39;1&#39;
+                           );
+      $phpgrid-&#62;run();
+?&#62;</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>Propiedades</title>
+
+      <para>Existe una documentación generada con PHPDocumentor, donde se
+      especifican todas las propiedades, en esta sección se va ilustrar con
+      ejemplos el uso de algunas de ellas.</para>
+
+      <sect3>
+        <title>Labels</title>
+
+        <para>Este array contiene las etiquetas que se utilizarán para
+        presentar los nombres de campo al usuario, el array debe ser de la
+        forma campo=etiqueta</para>
+
+        <programlisting>var $labels=array();</programlisting>
+
+        <para><emphasis>Ejemplo:</emphasis></para>
+
+        <programlisting>$dbgrid-&#62;labels=array(
+                     &#39;prod_id&#39;=&#62;&#39;Propiedades&#39;,
+                     &#39;prod_owner&#39;=&#62;&#39;Propietario&#39;,
+                     &#39;prod_type&#39;=&#62;&#39;Tipo&#39;,
+                     &#39;prod_label&#39;=&#62;&#39;Etiqueta&#39;
+                     );</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>Relations</title>
+
+        <para>Este array indica las relaciones de un campo con otras tablas,
+        el array debe ser de la forma campo=propiedades, donde propiedades es
+        un array que contiene las propiedades en formato propiedad=valor</para>
+
+        <programlisting>var $relations=array();</programlisting>
+
+        <para><emphasis>Propiedades:</emphasis></para>
+
+        <itemizedlist>
+          <listitem>
+            <para>detailtable: Indica la tabla que contiene los registros
+            detalle</para>
+          </listitem>
+
+          <listitem>
+            <para>linkfield: Indica el campo que enlaza con este campo, la
+            relación puede ser 1-1 o 1-n</para>
+          </listitem>
+
+          <listitem>
+            <para>displayfield: Indica qué campo de la tabla detalle se
+            mostrará en la rejilla, útil para una relación 1-1</para>
+          </listitem>
+
+          <listitem>
+            <para>displayfunction: Indica qué función se llamará para obtener
+            el texto a mostrar en la rejilla en el lugar del campo</para>
+
+            <para><emphasis>Formato de la función:</emphasis><programlisting>function displayfunction(&#38;$rs)
+{
+    return (&#39;texto a mostrar&#39;);
+}</programlisting></para>
+
+            <para>$rs contiene un result set o conjunto de datos que apuntan a
+            la tabla detalle filtrada por el campo clave. Esto es útil cuando
+            el campo que hay que visualizar debe ser formateado o está
+            compuesto por otros campos del mismo registro.</para>
+          </listitem>
+
+          <listitem>
+            <para>refpage: Es un enlace a una página que sirva para hacer el
+            mantenimiento de la tabla detalle, útil para relaciones 1-n</para>
+          </listitem>
+        </itemizedlist>
+
+        <para><emphasis>Ejemplo:</emphasis></para>
+
+        <programlisting>$dbgrid-&#62;relations=array(
+                        &#39;prod_id&#39;=&#62;array(&#39;detailtable&#39;=&#62;&#39;attributes&#39;,&#39;linkfield&#39;=&#62;&#39;attr_prod&#39;,&#39;displayfunction&#39;=&#62;&#39;displayattributes&#39;,&#39;refpage&#39;=&#62;&#39;attributes.php&#39;),
+                        &#39;prod_owner&#39;=&#62;array(&#39;detailtable&#39;=&#62;&#39;nuke_users&#39;,&#39;linkfield&#39;=&#62;&#39;pn_uid&#39;,&#39;displayfield&#39;=&#62;&#39;pn_uname&#39;)
+                        );</programlisting>
+
+        <para><emphasis>Ejemplo de función:</emphasis></para>
+
+        <programlisting>      function displayattributes(&#38;$rs)
+      {
+         $result=&#39;&#39;;
+         while (!$rs-&#62;EOF)
+         {
+                 $attrname=$rs-&#62;fields[&#39;attr_name&#39;];
+                 $attrvalue=$rs-&#62;fields[&#39;attr_value&#39;];
+
+                 $result.=&#34;[$attrname=$attrvalue]&#38;nbsp;&#34;;
+
+                 $rs-&#62;MoveNext();
+         }
+         return ($result);
+      }</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>Controls</title>
+
+        <para>Este array indica qué controles se utilizan para editar la
+        información de cada campo, el array debe ser de la forma
+        campo=control, donde control es un array, cuyo primer elemento indica
+        el tipo de control que se quiere usar y como valor de ese elemento un
+        array con las propiedades del control en formato propiedad=valor.</para>
+
+        <programlisting>var $controls=array();</programlisting>
+
+        <para><emphasis>Controles:</emphasis></para>
+
+        <itemizedlist>
+          <listitem>
+            <para>edit: Indica una caja de edición de texto, como parámetros
+            puede tomar cualquier atributo del tag &#60;input&#62;, excepto
+            type, name y value</para>
+          </listitem>
+
+          <listitem>
+            <para>textarea: Indica una caja de edición de texto multilínea,
+            como parámetros puede tomar cualquier atributo del tag
+            &#60;input&#62;, excepto name</para>
+          </listitem>
+
+          <listitem>
+            <para>radio: No acepta parámetros</para>
+          </listitem>
+
+          <listitem>
+            <para>checkbox: No acepta parámetros</para>
+          </listitem>
+
+          <listitem>
+            <para>combo: Acepta la propiedad items, que debe ser a su vez, un
+            array de tipo valor=texto</para>
+          </listitem>
+
+          <listitem>
+            <para>list: Acepta la propiedad items, que debe ser a su vez, un
+            array de tipo valor=texto</para>
+          </listitem>
+
+          <listitem>
+            <para>custom: Este tipo de control permite crear controles
+            personalizados para la edición de un campo, el parámetro que
+            acepta es function, que debe contener el nombre de la función a la
+            que llamar. Esta función debe devolver el código que forma el
+            control de edición, la función debe tener esta forma:</para>
+
+            <para><programlisting>function getcontrolfunction(&#38;field,value)
+{
+    return (&#39;html del texto a mostrar&#39;);
+}</programlisting></para>
+
+            <para>$field contiene el objeto de tipo campo que se quiere
+            editar, y $value, el valor que debe mostrar el control. El control
+            que se devuelva debe tener el nombre del campo, ya que este se
+            utiliza para actualizaciones, grabaciones y búsquedas.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para><emphasis>Ejemplo:</emphasis></para>
+
+        <programlisting>$dbgrid-&#62;controls=array(&#39;prod_type&#39;=&#62;array(&#39;combo&#39;=&#62;array(&#39;items&#39;=&#62;array(&#39;1&#39;=&#62;&#39;Firewall&#39;,&#39;2&#39;=&#62;&#39;CSR&#39;,&#39;3&#39;=&#62;&#39;Antivirus&#39;))));</programlisting>
+
+        <para><emphasis>Ejemplo de función:</emphasis></para>
+
+        <programlisting>      function getcontrol($field,$value)
+      {
+         $result=&#34;&#60;input type=\&#34;text\&#34; name=\&#34;$field-&#62;name\&#34; value=\&#34;$value\&#34;&#62;&#34;;
+         return ($result);
+      }</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>calculatedfields</title>
+
+        <para>Este array es útil para añadir campos a una tabla, bien sea con
+        operaciones a hacer con cada registro, o con información procedente de
+        otras fuentes, el formato del array es etiquetadecampo=funcionallamar</para>
+
+        <programlisting>var $calculatedfields=array();</programlisting>
+
+        <para><emphasis>Ejemplo:</emphasis><programlisting>      function userrole(&#38;$rs)
+      {
+         $user=$rs-&#62;fields[&#39;pn_uname&#39;];
+         $result=&#34;&#60;font color=\&#34;#FF0000\&#34;&#62;USUARIO&#60;/font&#62;&#34;;
+         $rol=ldap_search_rol($user);
+         if ($rol!=&#39;&#39;) $result=$rol;
+         return ($result);
+      }
+
+      function useractions(&#38;$rs)
+      {
+         $userid=$rs-&#62;fields[&#39;pn_uid&#39;];
+         $result=&#39;&#39;;
+         $result.=&#34;&#38;nbsp;&#60;A HREF=\&#34;general.php?uid=$userid\&#34;&#62;[Datos comunes]&#60;/A&#62;&#34;;
+         $result.=&#34;&#38;nbsp;&#60;A HREF=\&#34;ldap.php?id=$userid\&#34;&#62;[Tipo de identidad]&#60;/A&#62;&#34;;
+         $result.=&#34;&#38;nbsp;&#60;A HREF=\&#34;accounts.php?uid=$userid\&#34;&#62;[Datos bancarios]&#60;/A&#62;&#34;;
+         $result.=&#34;&#38;nbsp;&#60;A HREF=\&#34;gsdinfo.php?uid=$userid\&#34;&#62;[GSDInfo]&#60;/A&#62;&#34;;
+         return ($result);
+      }
+
+$dbgrid-&#62;calculatedfields=array(&#39;Tipo&#39;=&#62;&#39;userrole&#39;, &#39;Acciones&#39;=&#62;&#39;useractions&#39;);</programlisting></para>
+
+        <para>La función debe ser del tipo que se documenta en el ejemplo, $rs
+        es un resultset posicionado en el registro para el cual se pide el
+        campo.</para>
+      </sect3>
+
+      <sect3>
+        <title>getfieldvaluefunctions</title>
+
+        <para>Este array sirve para dar formato a un campo mediante una
+        función, tanto en la rejilla como en el formulario. El array debe ser
+        de la forma campo=función.</para>
+
+        <programlisting>var $getfieldvaluefunctions=array();</programlisting>
+
+        <para><emphasis>Ejemplo:</emphasis><programlisting>      function showproduct($field,$value)
+      {
+         switch($value)
+         {
+                 case &#39;1&#39;:
+                 {
+                         $result=&#39;Firewall&#39;;
+                         break;
+                 }
+                 case &#39;2&#39;:
+                 {
+                         $result=&#39;CSR&#39;;
+                         break;
+                 }
+                 case &#39;3&#39;:
+                 {
+                         $result=&#39;Antivirus&#39;;
+                         break;
+                 }
+         }
+         return ($result);
+      }
+
+      $dbgrid-&#62;getfieldvaluefunctions=array(
+                       &#39;prod_type&#39;=&#62;&#39;showproduct&#39;
+      );</programlisting></para>
+
+        <para>La función debe ser del tipo que se documenta en el ejemplo,
+        $field es un objeto que representa el campo y $value, el valor actual.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Métodos</title>
+
+      <para>La clase contiene varios métodos, pero aqui solo se documentan los
+      que son utiles de cara al usuario</para>
+
+      <sect3>
+        <title>Constructor</title>
+
+        <para>El constructor inicializa la clase con los valores por defecto</para>
+
+        <programlisting>function DBGrid($host,$user,$password,$database,$table)</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>editorinsert</title>
+
+        <para>Este método poner al grid en edición inserción en base a si el
+        registro indicado existe o no, es un sustituto para el método run</para>
+
+        <programlisting>function editorinsert($field,$value)</programlisting>
+
+        <para>$field es el campo que se quiere buscar y $value el valor que se
+        quiere comprobar</para>
+      </sect3>
+
+      <sect3>
+        <title>run</title>
+
+        <para>Este es el método principal, ya que procesa todas las
+        operaciones y realiza las acciones necesarias</para>
+
+        <programlisting>function run()</programlisting>
+      </sect3>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Características previstas</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>CSS para personalizar todos los elementos visuales</para>
+      </listitem>
+
+      <listitem>
+        <para>Borrados en cascada</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+</article>
