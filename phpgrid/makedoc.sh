@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: makedoc.sh,v 1.1 2002/10/28 11:37:59 ttm Exp $ 
+# $Id: makedoc.sh,v 1.2 2002/11/22 08:49:16 ttm Exp $ 
 
 #/**
 #  * makedoc - PHPDocumentor script to save your settings
