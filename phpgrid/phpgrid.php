@@ -22,12 +22,26 @@
                                                                              
 ***************************************************************************/
 
+define ("COLOR1",'#F0F0F0');
+define ("COLOR2",'#E0E0E0');
+define ("COLOR3",'#B6C3F2');
+define ("COLOR4",'#ABCEE9');
+define ("DELETEMESSAGE",'¿Está seguro que quiere borrar los registros seleccionados?');
+
+define ('RECORDSPERPAGE',10);
+define ('MAXFIELDSIZE',20);
+define ('DEFAULTCOLS',30);
+define ('DEFAULTROWS',5);
+
+define ("ADODBPATH",'adodb');
+define ("IMAGEPATH",'phpgrid/images');
+
+
         /**
         *Data abstraction layer
         */
-        include "adodb/adodb.inc.php";
-
-
+        include ADODBPATH."/adodb.inc.php";
+		
         /**
         *Opens a table with border
         */
@@ -113,7 +127,7 @@
                 * Last error number
                 * @var integer
                 */
-                var $lasterror;
+                var $lasterror=0;
 				
 				var $insertarray=array();
 				
@@ -126,7 +140,7 @@
                 * Last error message
                 * @var string
                 */
-                var $lasterrmsg;
+                var $lasterrmsg='';
 
                 /**
                 *Whether the grid table is 100% width or not
@@ -261,7 +275,7 @@
                  /**
                  *Colors for the grid
                  */
-                 var $colors=array('#F0F0F0','#E0E0E0','#B6C3F2','#ABCEE9');
+                 var $colors=array(COLOR1,COLOR2,COLOR3,COLOR4);
 
                  /**
                  *Ask for confirmation before delete a record
@@ -271,27 +285,27 @@
                  /**
                  *Delete message
                  */				 
-				 var $deletemessage="¿Está seguro que quiere borrar los registros seleccionados?";
+				 var $deletemessage=DELETEMESSAGE;
 
                  /**
                  *Records per page
                  */
-                 var $recordsperpage=10;
+                 var $recordsperpage=RECORDSPERPAGE;
 
                  /**
                  *Max field size
                  */
-                 var $maxfieldsize=20;
+                 var $maxfieldsize=MAXFIELDSIZE;
 
                  /**
                  *Text area default columns
                  */
-                 var $defaultcols=30;
+                 var $defaultcols=DEFAULTCOLS;
 
                  /**
                  *Text area default rows
                  */
-                 var $defaultrows=5;
+                 var $defaultrows=DEFAULTROWS;
 
                  /**
                  *Fields to be included on a form
@@ -342,6 +356,16 @@
                  *This event is fired after an insert operation
                  */
                  var $afterinsert='';
+				 
+                 /**
+                 *For getrecord method, to check if the user wants a new search
+                 */				 
+				 var $lastfield='';
+				 
+                 /**
+                 *For getrecord method, to check if the user wants a new search
+                 */					 
+				 var $lastvalue='';
 
                  /**
                  *Allowed actions
@@ -359,8 +383,12 @@
                  */
                  function allowedto($action)
                  {
-                         if ($this->allowedactions[$action]=='1') return (true);
-                         else return(false);
+						 if (array_key_exists($action,$this->allowedactions))
+						 {
+							 if ($this->allowedactions[$action]=='1') return (TRUE);
+							 else return(FALSE);
+						 }
+						 else return(FALSE);
                  }
 
 
@@ -509,8 +537,8 @@
 									 if ($refpage!='')
 									 {
 								              $control=$this->getFieldValue($fieldobject,$fieldname,$value);									 
-											  $control.="<A HREF=\"$refpage?sbinsert_x=5&amp;$linkfield=$value&amp;where=$linkfield&amp;wherevalue=$value\" title=\"Añadir\"><img src=\"phpgrid/binsert.gif\" border=\"0\"></A>";
-											  $control.="<A HREF=\"$refpage?$linkfield=$value&amp;where=$linkfield&amp;wherevalue=$value\" title=\"Editar\"><img src=\"phpgrid/bedit.gif\" border=\"0\"></A>";
+											  $control.="<A HREF=\"$refpage?sbinsert_x=5&amp;$linkfield=$value&amp;where=$linkfield&amp;wherevalue=$value\" title=\"Añadir\"><img src=\"".IMAGEPATH."/binsert.gif\" border=\"0\"></A>";
+											  $control.="<A HREF=\"$refpage?$linkfield=$value&amp;where=$linkfield&amp;wherevalue=$value\" title=\"Editar\"><img src=\"".IMAGEPATH."/bedit.gif\" border=\"0\"></A>";
 											  $control="<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td align=\"right\">$control</td></tr></table>";
 									 }
 									 else
@@ -519,7 +547,7 @@
 											 $control=$this->getTableCombo($fieldobject->name,$detailtable,$linkfield,$displayfield,$value,$filter);
 											 if ($lookup!='')
 											 {
-												 $control.="&nbsp;<a href=\"javascript:show".$fieldobject->name."lookup('$lookup','$linkfield','$displayfield','$lookupparams');\"><img src=\"phpgrid/dots.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
+												 $control.="&nbsp;<a href=\"javascript:show".$fieldobject->name."lookup('$lookup','$linkfield','$displayfield','$lookupparams');\"><img src=\"".IMAGEPATH."/dots.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
 											 }
 
 											echo "<script language=\"Javascript\">\n";
@@ -586,7 +614,7 @@
 											 {
 												case 'date':
 												{
-													$extra="&nbsp;<a href=\"javascript:show_calendar('document.$fname.$fieldname', document.$fname.$fieldname.value);\"><img src=\"phpgrid/cal.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
+													$extra="&nbsp;<a href=\"javascript:show_calendar('document.$fname.$fieldname', document.$fname.$fieldname.value);\"><img src=\"".IMAGEPATH."/cal.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
 													$valid=" onblur=\"check_date(this)\" ";
 												}
 											  }
@@ -599,7 +627,7 @@
 											  if (($fieldobject->type=='date') && ($this->action=='lookup'))
 											  {
 													$fieldname=$fieldname.'_until';  
-													$extra="&nbsp;<a href=\"javascript:show_calendar('document.$fname.$fieldname', document.$fname.$fieldname.value);\"><img src=\"phpgrid/cal.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
+													$extra="&nbsp;<a href=\"javascript:show_calendar('document.$fname.$fieldname', document.$fname.$fieldname.value);\"><img src=\"".IMAGEPATH."/cal.gif\" width=\"16\" height=\"16\" border=\"0\"></a>";
 													$valid=" onblur=\"check_date(this)\" ";
 													
 													$control.="&nbsp;-&nbsp;<input type=\"text\" name=\"$fieldname\" value=\"$value\" size=\"$fieldsize\" maxlength=\"$maxsize\" $valid>";
@@ -689,11 +717,12 @@
                  */
                  function update()
                  {
+					     $result=TRUE;
 						 //Checks the right permissions
                          if (!$this->allowedto('EDIT'))
                          {
                                  echo "No le está permitido realizar esta acción [EDIT]";
-                                 exit;
+								 exit;
                          }
 
 						 //Calls the event if it exists
@@ -703,7 +732,9 @@
                                  $sender=$this;
                                  $result=1;
                                  eval ("\$result=$event(\$sender);");
-                                 if (!$result) return;
+								 
+								 $result=FALSE;
+                                 if (!$result) return($result);
                          }
 
                          $this->lasterror=0;
@@ -765,8 +796,6 @@
 
                          //Performs the update
                          $sql = "UPDATE $this->table SET $filters WHERE $cond";
-						 
-						 
 						 
 						 $this->ExecSQL($sql);
 
@@ -1795,7 +1824,7 @@
 
                                  if (!$this->showcheckboxes) $colspan--;
                                  echo "<td align=\"right\" colspan=\"$colspan\">\n";
-                                 include "phpgrid/navigator.php";
+								 $this->printNavigator();
                                  echo "</td>\n";
                                  echo "</tr>\n";
                          }
@@ -1833,6 +1862,32 @@
 								 echo "</form>\n";
                          }
                  }
+
+                 /**
+                 *Shows the navigator
+                 *
+                 *This function shows the navigator buttons according to user permissions
+                 *
+                 */				 
+                 function printNavigator()
+                 {			
+					 if ($this->allowedto('FIRST')) echo "<input type=\"image\" name=\"sbfirst\" src=\"".IMAGEPATH."/bfirst.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Primero\" title=\"Primero\"  >";
+					 if ($this->allowedto('PRIOR')) echo "<input type=\"image\" name=\"sbprior\" src=\"".IMAGEPATH."/bprior.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Anterior\" title=\"Anterior\"  >";
+					 if ($this->allowedto('NEXT')) echo "<input type=\"image\" name=\"sbnext\" src=\"".IMAGEPATH."/bnext.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Siguiente\" title=\"Siguiente\"  >";
+					 if ($this->allowedto('LAST')) echo "<input type=\"image\" name=\"sblast\" src=\"".IMAGEPATH."/blast.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Último\" title=\"Último\"  >";
+					 if ($this->allowedto('INSERT')) echo "<input type=\"image\" name=\"sbinsert\" src=\"".IMAGEPATH."/binsert.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Añadir\" title=\"Añadir\"  >";
+					 if ($this->allowedto('DELETE'))
+					 {
+						 echo "<input type=\"image\" name=\"sbdelete\" src=\"".IMAGEPATH."/bdelete.gif\" width=\"24\" height=\"24\" border=\"0\"";
+						 if ($this->confirmdelete)
+						 {
+							 echo " onclick=\"return(confirmDelete());\"";
+						 }
+						 echo " alt=\"Borrar\" title=\"Borrar\" >";
+					 }
+					 if ($this->allowedto('SEARCH')) echo "<input type=\"image\" name=\"sbsearch\" src=\"".IMAGEPATH."/bsearch.gif\" width=\"24\" height=\"24\" border=\"0\" alt=\"Buscar\" title=\"Buscar\"  >";
+					 if ($this->allowedto('HELP')) echo "<a href=\"javascript:showHelpWindow();\" alt=\"Ayuda\" title=\"Ayuda\"><img src=\"".IMAGEPATH."/help.gif\" width=\"24\" height=\"24\" border=\"0\"></a>";				 
+				 }
 				 
                  /**
                  *Updates the status text based on the current query
@@ -2556,7 +2611,7 @@
                  *This function is useful to know if a record exists in the table
                  *
                  *@param string $field Field name
-                 *@param string $value Value of the field
+                 *@param string $value Value of the field, if it's a string, must be enclosed in quotes
                  *@return boolean
                  */
                  function recordexists($field,$value)
@@ -2579,12 +2634,16 @@
                  *Selects a record and returns an array with field=>value
                  *
                  *@param string $field Field name
-                 *@param string $value Value of the field
+                 *@param string $value Value of the field, if it's a string, must be enclosed in quotes
                  *@return array
                  */
                  function getfieldsvalues($field,$value,$relations=FALSE)
                  {
-						 if ($this->rs)
+						 $newsearch=FALSE;
+						 
+						 if (($this->lastfield!=$field) || ($this->lastvalue!=$value)) $newsearch=TRUE;
+						 
+						 if (($this->rs) && ($newsearch==FALSE))
 						 {
 							 $this->rs->MoveNext();
 							 if ($this->rs->EOF) 
@@ -2597,6 +2656,9 @@
 							 $sql = "select * from $this->table where $field=$value";
 							 $this->connect();
 							 $this->rs= $this->ExecSQL($sql);
+							 
+							 $this->lastfield=$field;
+							 $this->lastvalue=$value;
 						 }
 						
 						 $fields=array();
@@ -2624,7 +2686,11 @@
                  */				 
 				 function getrecord($field,$value,$filtered=FALSE)
                  {
-						 if ($this->rs)
+						 $newsearch=FALSE;
+						 
+						 if (($this->lastfield!=$field) || ($this->lastvalue!=$value)) $newsearch=TRUE;
+						 
+						 if (($this->rs) && ($newsearch==FALSE))
 						 {
 							 $this->rs->MoveNext();
 							 if ($this->rs->EOF) 
@@ -2645,6 +2711,9 @@
 							 }
 							 $this->connect();
 							 $this->rs= $this->ExecSQL($sql);
+							 
+							 $this->lastfield=$field;
+							 $this->lastvalue=$value;							 
 							 
 							 if ($this->rs->EOF) 
 							 {
